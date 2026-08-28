@@ -7,21 +7,21 @@ import com.example.base.dto.response.ChamadoRespDto;
 import com.example.base.dto.response.UsuarioRespDto;
 import com.example.base.model.Chamado;
 import com.example.base.model.Status;
-import com.example.base.model.Usuario;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class ChamadoServiceImpl implements ChamadoService {
 
     private final ChamadoRepository chamadoRepository;
     private final UsuarioRepository usuarioRepository;
 
+    @Transactional
     @Override
     public ChamadoRespDto cadastrarChamado(ChamadoReqDto chamadoReqDto, Long id) {
         var usuarioBuscado = usuarioRepository.findById(id).orElseThrow(() -> new InvalidParameterException());
@@ -49,6 +49,7 @@ public class ChamadoServiceImpl implements ChamadoService {
                 .toList();
     }
 
+    @Override
     public List<ChamadoRespDto> listarChamadoPorStatus(Status status) {
         List<Chamado> chamados = chamadoRepository.findByStatus(status);
 
@@ -57,6 +58,14 @@ public class ChamadoServiceImpl implements ChamadoService {
                 .toList();
     }
 
+    @Override
+    public List<ChamadoRespDto> listarChamadosPorUsuario_IdEStatus(Long id, Status status) {
+        List<Chamado> chamados = chamadoRepository.findByUsuario_IdAndStatus(id, status);
+
+        return chamados.stream()
+                .map(chamado -> new ChamadoRespDto(chamado.getId(), chamado.getTitulo(), chamado.getDescricao(), chamado.getPrioridade(), chamado.getStatus(), new UsuarioRespDto((chamado.getUsuario().getId()), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail())))
+                .toList();
+    }
 
 
 }

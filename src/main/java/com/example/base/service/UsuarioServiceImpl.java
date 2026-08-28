@@ -7,15 +7,18 @@ import com.example.base.model.Papel;
 import com.example.base.model.Usuario;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository repository;
 
+    @Transactional
     @Override
     public UsuarioRespDto cadastrarAdministrador(UsuarioReqDto usuarioReqDto) {
 

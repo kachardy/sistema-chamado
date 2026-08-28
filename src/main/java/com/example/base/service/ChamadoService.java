@@ -10,4 +10,5 @@ public interface ChamadoService {
     ChamadoRespDto cadastrarChamado(ChamadoReqDto chamadoReqDto, Long id);
     List<ChamadoRespDto> listarChamadoPorUsuario_Id(Long id);
     List<ChamadoRespDto> listarChamadoPorStatus(Status status);
+    List<ChamadoRespDto> listarChamadosPorUsuario_IdEStatus(Long id, Status status);
 }

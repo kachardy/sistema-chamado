@@ -26,7 +26,7 @@ public class ChamadoController {
 
     @GetMapping("/usuarios/{usuarioId}/chamados/abertos")
     public ResponseEntity<List<ChamadoRespDto>> listarChamadoPorUsuarioId(@PathVariable Long usuarioId) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadoPorUsuario_Id(usuarioId));
+        return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadosPorUsuario_IdEStatus(usuarioId, Status.ABERTO));
     }
 
     @GetMapping("/status")
