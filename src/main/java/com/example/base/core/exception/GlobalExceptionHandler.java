@@ -36,4 +36,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> tratarRegraDeNegocio(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", ex.getMessage()));
     }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> tratarErroDeDesserializacao(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        String mensagem = "Erro na leitura do JSON. Verifique se os dados enviados (como Prioridade ou Categoria) estão corretos e correspondem aos valores aceitos pelo sistema.";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", mensagem));
+    }
 }

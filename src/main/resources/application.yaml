@@ -18,4 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  data:
+    web:
+      pageable:
+        max-page-size: 50
 
