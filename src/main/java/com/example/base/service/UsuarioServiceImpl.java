@@ -6,6 +6,8 @@ import com.example.base.dto.response.UsuarioRespDto;
 import com.example.base.model.Papel;
 import com.example.base.model.Usuario;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +38,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<UsuarioRespDto> listarAdministradores() {
-        List<Usuario> usuarios = repository.findAllByPapel(Papel.ADMIN);
+    public Page<UsuarioRespDto> listarAdministradores(Pageable pageable) {
+        Page<Usuario> usuarios = repository.findAllByPapel(Papel.ADMIN, pageable);
 
-        return usuarios.stream()
-                .map(usuario -> new UsuarioRespDto(usuario.getId(), usuario.getNome(), usuario.getEmail()))
-                .toList();
+        return usuarios.map(usuario ->
+                new UsuarioRespDto(usuario.getId(), usuario.getNome(), usuario.getEmail())
+        );
     }
 
     private void validarDadosCadastro(UsuarioReqDto dto) {
