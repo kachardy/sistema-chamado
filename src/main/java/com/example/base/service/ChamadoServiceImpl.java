@@ -5,6 +5,7 @@ import com.example.base.dao.UsuarioRepository;
 import com.example.base.dto.request.ChamadoReqDto;
 import com.example.base.dto.response.ChamadoRespDto;
 import com.example.base.dto.response.UsuarioRespDto;
+import com.example.base.exception.RecursoNaoEncontradoException;
 import com.example.base.model.Chamado;
 import com.example.base.model.Status;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class ChamadoServiceImpl implements ChamadoService {
     @Transactional
     @Override
     public ChamadoRespDto cadastrarChamado(ChamadoReqDto chamadoReqDto, Long id) {
-        var usuarioBuscado = usuarioRepository.findById(id).orElseThrow(() -> new InvalidParameterException());
+        var usuarioBuscado = usuarioRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado."));
 
 
         Chamado chamado = new Chamado();
@@ -42,6 +43,9 @@ public class ChamadoServiceImpl implements ChamadoService {
 
     @Override
     public List<ChamadoRespDto> listarChamadoPorUsuario_Id(Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado.");
+        }
         List<Chamado> chamados = chamadoRepository.findByUsuario_Id(id);
 
         return chamados.stream()
@@ -60,6 +64,9 @@ public class ChamadoServiceImpl implements ChamadoService {
 
     @Override
     public List<ChamadoRespDto> listarChamadosPorUsuario_IdEStatus(Long id, Status status) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado.");
+        }
         List<Chamado> chamados = chamadoRepository.findByUsuario_IdAndStatus(id, status);
 
         return chamados.stream()

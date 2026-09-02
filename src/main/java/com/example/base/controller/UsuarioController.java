@@ -3,6 +3,7 @@ package com.example.base.controller;
 import com.example.base.dto.request.UsuarioReqDto;
 import com.example.base.dto.response.UsuarioRespDto;
 import com.example.base.service.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class UsuarioController {
     private final UsuarioService service;
 
     @PostMapping("/admins")
-    public ResponseEntity<UsuarioRespDto> cadastrarUsuario(@RequestBody UsuarioReqDto usuarioReqDto) {
+    public ResponseEntity<UsuarioRespDto> cadastrarUsuario(@RequestBody @Valid UsuarioReqDto usuarioReqDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrarAdministrador(usuarioReqDto));
     }
 

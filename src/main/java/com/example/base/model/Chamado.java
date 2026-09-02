@@ -30,4 +30,8 @@ public class Chamado {
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria", nullable = false)
+    private Categoria categoria;
 }
