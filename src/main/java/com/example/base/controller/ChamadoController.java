@@ -38,4 +38,12 @@ public class ChamadoController {
         return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadoPorStatus(status, pageable));
     }
 
+    @GetMapping("/usuarios/{usuarioId}/chamados")
+    public ResponseEntity<Page<ChamadoRespDto>> listarChamadosComFiltro(
+            @PathVariable Long usuarioId,
+            @RequestParam(required = false) Status status,
+            @PageableDefault(size = 10, sort = "titulo") Pageable pageable) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadosDoUsuarioComFiltro(usuarioId, status, pageable));
+    }
 }

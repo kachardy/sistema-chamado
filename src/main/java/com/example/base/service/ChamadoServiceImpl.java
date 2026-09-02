@@ -107,5 +107,31 @@ public class ChamadoServiceImpl implements ChamadoService {
         );
     }
 
+    @Override
+    public Page<ChamadoRespDto> listarChamadosDoUsuarioComFiltro(Long id, Status status, Pageable pageable) {
+
+        if (!usuarioRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado.");
+        }
+
+        Page<Chamado> chamados;
+
+        if (status == null) {
+            chamados = chamadoRepository.findByUsuario_Id(id, pageable);
+        } else {
+            chamados = chamadoRepository.findByUsuario_IdAndStatus(id, status, pageable);
+        }
+
+        return chamados.map(chamado -> new ChamadoRespDto(
+                chamado.getId(),
+                chamado.getTitulo(),
+                chamado.getDescricao(),
+                chamado.getPrioridade(),
+                chamado.getStatus(),
+                new UsuarioRespDto(chamado.getUsuario().getId(), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail()),
+                chamado.getCategoria()
+        ));
+    }
+
 
 }

@@ -11,4 +11,5 @@ public interface ChamadoService {
     Page<ChamadoRespDto> listarChamadoPorUsuario_Id(Long id, Pageable pageable);
     Page<ChamadoRespDto> listarChamadoPorStatus(Status status, Pageable pageable);
     Page<ChamadoRespDto> listarChamadosPorUsuario_IdEStatus(Long id, Status status, Pageable pageable);
+    Page<ChamadoRespDto> listarChamadosDoUsuarioComFiltro(Long id, Status status, Pageable pageable);
 }
