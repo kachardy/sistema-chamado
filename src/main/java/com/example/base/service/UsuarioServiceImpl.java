@@ -8,10 +8,9 @@ import com.example.base.model.Usuario;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -19,6 +18,7 @@ import java.util.List;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -29,7 +29,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = new Usuario();
         usuario.setNome(usuarioReqDto.nome());
         usuario.setEmail(usuarioReqDto.email());
-        usuario.setSenha(usuarioReqDto.senha());
+        usuario.setSenha(passwordEncoder.encode(usuarioReqDto.senha()));
         usuario.setPapel(Papel.ADMIN);
 
         var usuarioSalvo = repository.save(usuario);
