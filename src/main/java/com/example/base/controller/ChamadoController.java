@@ -1,6 +1,7 @@
 package com.example.base.controller;
 
 
+import com.example.base.dto.UsuarioLogadoDto;
 import com.example.base.dto.request.ChamadoReqDto;
 import com.example.base.dto.response.ChamadoRespDto;
 import com.example.base.model.Status;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -22,14 +24,14 @@ public class ChamadoController {
 
     private final ChamadoService service;
 
-    @PostMapping("/usuarios/{usuarioId}/chamados")
-    public ResponseEntity<ChamadoRespDto> cadastrarChamado(@RequestBody @Valid ChamadoReqDto chamadoReqDto, @PathVariable Long usuarioId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrarChamado(chamadoReqDto, usuarioId));
+    @PostMapping
+    public ResponseEntity<ChamadoRespDto> cadastrarChamado(@RequestBody @Valid ChamadoReqDto chamadoReqDto, @AuthenticationPrincipal UsuarioLogadoDto usuarioLogadoDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrarChamado(chamadoReqDto, usuarioLogadoDto.id()));
     }
 
-    @GetMapping("/usuarios/{usuarioId}/chamados/abertos")
-    public ResponseEntity<Page<ChamadoRespDto>> listarChamadoPorUsuarioId(@PathVariable Long usuarioId, @PageableDefault(size = 10, sort = "titulo") Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadosPorUsuario_IdEStatus(usuarioId, Status.ABERTO, pageable));
+    @GetMapping("/usuarios/{usuarioId}/chamados/abertos/")
+    public ResponseEntity<Page<ChamadoRespDto>> listarChamadoPorUsuarioId(@AuthenticationPrincipal UsuarioLogadoDto usuarioLogadoDto, @PageableDefault(size = 10, sort = "titulo") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadosPorUsuario_IdEStatus(usuarioLogadoDto.id(), Status.ABERTO, pageable));
     }
 
     @GetMapping("/status")

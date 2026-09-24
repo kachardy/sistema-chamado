@@ -1,9 +1,12 @@
 package com.example.base.core.security;
 
+import com.example.base.dto.UsuarioLogadoDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -14,10 +17,12 @@ public class JwtServiceImpl implements JwtService {
 
     private final SecretKey secretKey = Keys.hmacShaKeyFor("minha-chave-ultra-secreta-de-pelo-menos-256-bits!!!".getBytes());
 
+    private final String AUTHORITIES_KEY =  "authorities";
+
     @Override
     public String generateToken(Authentication authentication) {
         return Jwts.builder().subject(authentication.getName())
-                .claim("authorities", authentication.getAuthorities()
+                .claim(AUTHORITIES_KEY, authentication.getAuthorities()
                         .stream()
                         .map(GrantedAuthority::getAuthority).toList())
                 .signWith(secretKey)
@@ -35,14 +40,16 @@ public class JwtServiceImpl implements JwtService {
                     .parseSignedClaims(token) // Faz a leitura do token
                     .getPayload(); // Extrai os dados (claims)
 
-            String username = claims.getSubject();
-            var roles = claims.get("authorities", java.util.List.class);
+            String userId = claims.getSubject();
+            var roles = claims.get(AUTHORITIES_KEY, java.util.List.class);
 
             var authorities = ((java.util.List<?>) roles).stream()
-                    .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority((String) role))
+                    .map(role -> new SimpleGrantedAuthority((String) role))
                     .toList();
 
-            return new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(username, null, authorities);
+            var usuarioLogado = new UsuarioLogadoDto(Long.parseLong(userId));
+
+            return new UsernamePasswordAuthenticationToken(usuarioLogado, null, authorities);
         } catch (Exception e) {
             return null; // Retorna nulo se o token for falso, alterado ou expirado
         }

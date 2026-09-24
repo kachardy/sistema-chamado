@@ -24,7 +24,7 @@ public class AuthController {
     @PostMapping("/login")
     public org.springframework.http.ResponseEntity<String> login(@RequestBody @jakarta.validation.Valid LoginReqDto dto) {
         String token = authService.login(dto);
-        return org.springframework.http.ResponseEntity.ok(token);
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/cadastro")
