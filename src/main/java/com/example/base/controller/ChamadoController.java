@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/chamado")
+@RequestMapping("v1/chamados")
 @AllArgsConstructor
 public class ChamadoController {
 
@@ -29,7 +29,7 @@ public class ChamadoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrarChamado(chamadoReqDto, usuarioLogadoDto.id()));
     }
 
-    @GetMapping("/usuarios/{usuarioId}/chamados/abertos/")
+    @GetMapping("/listar")
     public ResponseEntity<Page<ChamadoRespDto>> listarChamadoPorUsuarioId(@AuthenticationPrincipal UsuarioLogadoDto usuarioLogadoDto, @PageableDefault(size = 10, sort = "titulo") Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadosPorUsuario_IdEStatus(usuarioLogadoDto.id(), Status.ABERTO, pageable));
     }
@@ -39,7 +39,7 @@ public class ChamadoController {
         return ResponseEntity.status(HttpStatus.OK).body(service.listarChamadoPorStatus(status, pageable));
     }
 
-    @GetMapping("/usuarios/{usuarioId}/chamados")
+    @GetMapping("/{usuarioId}/filtro")
     public ResponseEntity<Page<ChamadoRespDto>> listarChamadosComFiltro(
             @PathVariable Long usuarioId,
             @RequestParam(required = false) Status status,

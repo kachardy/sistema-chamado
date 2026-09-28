@@ -22,7 +22,7 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public org.springframework.http.ResponseEntity<String> login(@RequestBody @jakarta.validation.Valid LoginReqDto dto) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginReqDto dto) {
         String token = authService.login(dto);
         return ResponseEntity.ok(token);
     }
