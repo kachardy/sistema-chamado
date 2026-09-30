@@ -3,6 +3,7 @@ package com.example.base.controller;
 import com.example.base.dto.request.LoginReqDto;
 import com.example.base.dto.request.UsuarioReqDto;
 import com.example.base.dto.response.UsuarioRespDto;
+import com.example.base.service.AuthService;
 import com.example.base.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class AuthController {
 
-    private final com.example.base.service.AuthService authService;
+    private final AuthService authService;
     private final UsuarioService usuarioService;
+
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid LoginReqDto dto) {

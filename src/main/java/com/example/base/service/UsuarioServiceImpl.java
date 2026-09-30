@@ -38,6 +38,22 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    @Transactional
+    public UsuarioRespDto cadastrarUsuario(UsuarioReqDto usuarioReqDto) {
+        validarDadosCadastro(usuarioReqDto);
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(usuarioReqDto.nome());
+        usuario.setEmail(usuarioReqDto.email());
+        usuario.setSenha(passwordEncoder.encode(usuarioReqDto.senha()));
+        usuario.setPapel(Papel.USUARIO);
+
+        var usuarioSalvo = repository.save(usuario);
+
+        return new UsuarioRespDto(usuarioSalvo.getId(), usuarioSalvo.getNome(), usuarioSalvo.getEmail());
+    }
+
+    @Override
     public Page<UsuarioRespDto> listarAdministradores(Pageable pageable) {
         Page<Usuario> usuarios = repository.findAllByPapel(Papel.ADMIN, pageable);
 

@@ -3,7 +3,7 @@ package com.example.base.core.exception;
 import com.example.base.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,31 +15,33 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("erro", ex.getMessage()));
+    public ResponseEntity<ErroPadrao> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErroPadrao(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> tratarErrosDeValidacao(MethodArgumentNotValidException ex) {
-        Map<String, String> erros = new HashMap<>();
+    public ResponseEntity<ErroPadrao> tratarErrosDeValidacao(MethodArgumentNotValidException ex) {
+        Map<String, String> errosCampos = new HashMap<>();
 
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String nomeCampo = ((FieldError) error).getField();
-            String mensagem = error.getDefaultMessage();
-            erros.put(nomeCampo, mensagem);
-        });
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errosCampos.put(error.getField(), error.getDefaultMessage())
+        );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erros", erros));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErroPadrao(HttpStatus.BAD_REQUEST.value(), "Erro de validação nos dados enviados", errosCampos));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> tratarRegraDeNegocio(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", ex.getMessage()));
+    public ResponseEntity<ErroPadrao> tratarRegraDeNegocio(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErroPadrao(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     }
 
-    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> tratarErroDeDesserializacao(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErroPadrao> tratarErroDeDesserializacao(HttpMessageNotReadableException ex) {
         String mensagem = "Erro na leitura do JSON. Verifique se os dados enviados (como Prioridade ou Categoria) estão corretos e correspondem aos valores aceitos pelo sistema.";
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", mensagem));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErroPadrao(HttpStatus.BAD_REQUEST.value(), mensagem));
     }
 }

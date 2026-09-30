@@ -20,12 +20,12 @@ public class AdminController {
     private final UsuarioService service;
 
     @PostMapping
-    public ResponseEntity<UsuarioRespDto> cadastrarUsuario(@RequestBody @Valid UsuarioReqDto usuarioReqDto) {
+    public ResponseEntity<UsuarioRespDto> cadastrarAdmins(@RequestBody @Valid UsuarioReqDto usuarioReqDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrarAdministrador(usuarioReqDto));
     }
 
     @GetMapping
-    public ResponseEntity<Page<UsuarioRespDto>> listarUsuarios(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+    public ResponseEntity<Page<UsuarioRespDto>> listarAdmins(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(service.listarAdministradores(pageable));
     }
 
