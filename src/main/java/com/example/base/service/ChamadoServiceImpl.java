@@ -6,11 +6,11 @@ import com.example.base.dto.request.ChamadoReqDto;
 import com.example.base.dto.response.ChamadoRespDto;
 import com.example.base.dto.response.UsuarioRespDto;
 import com.example.base.exception.RecursoNaoEncontradoException;
-import com.example.base.model.Chamado;
-import com.example.base.model.Status;
+import com.example.base.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.security.InvalidParameterException;
@@ -87,27 +87,6 @@ public class ChamadoServiceImpl implements ChamadoService {
     }
 
     @Override
-    public Page<ChamadoRespDto> listarChamadosPorUsuario_IdEStatus(Long id, Status status, Pageable pageable) {
-
-        if (!usuarioRepository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado.");
-        }
-
-        Page<Chamado> chamados = chamadoRepository.findByUsuario_IdAndStatus(id, status, pageable);
-
-        return chamados.map(chamado ->
-                new ChamadoRespDto(chamado.getId(),
-                        chamado.getTitulo(),
-                        chamado.getDescricao(),
-                        chamado.getPrioridade(),
-                        chamado.getStatus(),
-                        new UsuarioRespDto((chamado.getUsuario().getId()), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail()),
-                        chamado.getCategoria()
-                )
-        );
-    }
-
-    @Override
     public Page<ChamadoRespDto> listarChamadosDoUsuarioComFiltro(Long id, Status status, Pageable pageable) {
 
         if (!usuarioRepository.existsById(id)) {
@@ -131,6 +110,67 @@ public class ChamadoServiceImpl implements ChamadoService {
                 new UsuarioRespDto(chamado.getUsuario().getId(), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail()),
                 chamado.getCategoria()
         ));
+    }
+
+    @Override
+    public ChamadoRespDto buscarChamadoPorId(Long id, Long usuarioId) {
+        Chamado chamado = chamadoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Chamado com ID " + id + " não encontrado."));
+
+        Usuario usuarioLogado = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário logado não encontrado."));
+
+        if (usuarioLogado.getPapel() == Papel.USUARIO && !chamado.getUsuario().getId().equals(usuarioId)) {
+            throw new AccessDeniedException("Acesso negado: Este chamado pertence a outro usuário.");
+        }
+
+        return new ChamadoRespDto(
+                chamado.getId(),
+                chamado.getTitulo(),
+                chamado.getDescricao(),
+                chamado.getPrioridade(),
+                chamado.getStatus(),
+                new UsuarioRespDto(chamado.getUsuario().getId(), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail()),
+                chamado.getCategoria()
+        );
+    }
+
+    @Override
+    public Page<ChamadoRespDto> listarChamadosAdmin(Status status, Categoria categoria, Pageable pageable) {
+        Page<Chamado> chamados = chamadoRepository.buscarTodosComFiltros(status, categoria, pageable);
+
+        return chamados.map(chamado -> new ChamadoRespDto(
+                chamado.getId(),
+                chamado.getTitulo(),
+                chamado.getDescricao(),
+                chamado.getPrioridade(),
+                chamado.getStatus(),
+                new UsuarioRespDto(chamado.getUsuario().getId(), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail()),
+                chamado.getCategoria()
+        ));
+    }
+
+    @Override
+    public Page<ChamadoRespDto> listarChamadosPorUsuario_IdEStatus(Long id, Status status, String busca, Pageable pageable) {
+
+        if (!usuarioRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado.");
+        }
+
+        // A consulta faz o trabalho pesado de verificar os nulos
+        Page<Chamado> chamados = chamadoRepository.buscarMeusChamadosComFiltros(id, status, busca, pageable);
+
+        return chamados.map(chamado ->
+                new ChamadoRespDto(
+                        chamado.getId(),
+                        chamado.getTitulo(),
+                        chamado.getDescricao(),
+                        chamado.getPrioridade(),
+                        chamado.getStatus(),
+                        new UsuarioRespDto(chamado.getUsuario().getId(), chamado.getUsuario().getNome(), chamado.getUsuario().getEmail()),
+                        chamado.getCategoria()
+                )
+        );
     }
 
 

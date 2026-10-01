@@ -10,11 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/v1/admins")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
 
     private final UsuarioService service;
@@ -28,5 +30,4 @@ public class AdminController {
     public ResponseEntity<Page<UsuarioRespDto>> listarAdmins(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(service.listarAdministradores(pageable));
     }
-
 }

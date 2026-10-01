@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17-alpine3.24
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: demo
+    expose:
+      - 5432
+
+  api:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/main:/workspace/src/main
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/demo
+      SPRING_DATASOURCE_USERNAME: demo
+      SPRING_DATASOURCE_PASSWORD: secret
