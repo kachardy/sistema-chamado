@@ -24,7 +24,7 @@ public interface ChamadoRepository extends JpaRepository<Chamado, Long> {
 
     @Query("SELECT c FROM Chamado c WHERE c.usuario.id = :usuarioId " +
             "AND (:status IS NULL OR c.status = :status) " +
-            "AND (:busca IS NULL OR LOWER(c.titulo) LIKE LOWER(CONCAT('%', :busca, '%')) OR LOWER(c.descricao) LIKE LOWER(CONCAT('%', :busca, '%')))")
+            "AND (:busca IS NULL OR LOWER(c.titulo) LIKE :busca OR LOWER(c.descricao) LIKE :busca)")
     Page<Chamado> buscarMeusChamadosComFiltros(
             @Param("usuarioId") Long usuarioId,
             @Param("status") Status status,

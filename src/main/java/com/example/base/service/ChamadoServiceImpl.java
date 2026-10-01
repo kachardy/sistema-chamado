@@ -157,8 +157,11 @@ public class ChamadoServiceImpl implements ChamadoService {
             throw new RecursoNaoEncontradoException("Usuário com ID " + id + " não encontrado.");
         }
 
-        // A consulta faz o trabalho pesado de verificar os nulos
-        Page<Chamado> chamados = chamadoRepository.buscarMeusChamadosComFiltros(id, status, busca, pageable);
+        String buscaFormatada = (busca == null || busca.trim().isEmpty())
+                ? null
+                : "%" + busca.toLowerCase() + "%";
+
+        Page<Chamado> chamados = chamadoRepository.buscarMeusChamadosComFiltros(id, status, buscaFormatada, pageable);
 
         return chamados.map(chamado ->
                 new ChamadoRespDto(
